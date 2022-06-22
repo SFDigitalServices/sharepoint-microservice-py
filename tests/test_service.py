@@ -1,10 +1,13 @@
 # pylint: disable=redefined-outer-name
 """Tests for microservice"""
 import json
+from unittest.mock import patch
 import jsend
 import pytest
 from falcon import testing
 import service.microservice
+
+# pylint: disable=unused-argument
 
 CLIENT_HEADERS = {
     "ACCESS_KEY": "1234567"
@@ -47,7 +50,6 @@ def test_welcome_no_access_key(client, mock_env_no_access_key):
     response = client.simulate_get('/welcome')
     assert response.status_code == 403
 
-
 def test_default_error(client, mock_env_access_key):
     # pylint: disable=unused-argument
     """Test default error response"""
@@ -57,3 +59,40 @@ def test_default_error(client, mock_env_access_key):
 
     expected_msg_error = jsend.error('404 - Not Found')
     assert json.loads(response.content) == expected_msg_error
+
+@patch('tasks.upload_file.apply_async')
+@patch('requests.head')
+def test_sharepoint_file_upload(
+    mock_requests_head,
+    mock_upload_apply_async,
+    client,
+    mock_env_access_key):
+    """ Test file upload endpoint """
+
+    # happy path
+    response = client.simulate_put(
+        '/sharepoint/sfds_site/files',
+        json={
+            'source_url': 'https://sfgov.org/hello_world.pdf',
+            'destination_path': 'folder1/folder2/hello_world.pdf'
+        }
+    )
+    assert response.status_code == 200
+
+    # missing source_url
+    response = client.simulate_put(
+        '/sharepoint/sfds_site/files',
+        json={
+            'destination_path': 'folder1/folder2/hello_world.pdf'
+        }
+    )
+    assert response.status_code == 500
+
+    # missing destination_path
+    response = client.simulate_put(
+        '/sharepoint/sfds_site/files',
+        json={
+            'source_url': 'https://sfgov.org/hello_world.pdf'
+        }
+    )
+    assert response.status_code == 500

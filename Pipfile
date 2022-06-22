@@ -15,6 +15,11 @@ pytest = "*"
 pytest-cov = "*"
 pre-commit = "*"
 pylint = "*"
+msal = "*"
+requests = "*"
+pyjwt = "*"
+celery = "*"
+redis = "*"
 
 [requires]
 python_version = "3.7"

@@ -23,6 +23,9 @@ Install included packages
 Set ACCESS_KEY environment var and start WSGI Server
 > $ ACCESS_KEY=123456 pipenv run gunicorn 'service.microservice:start_service()'
 
+Start celery worker
+> $ pipenv run celery worker
+
 Run Pytest
 > $ pipenv run python -m pytest
 
@@ -66,7 +69,7 @@ Auto-reload on code changes
 > $ pipenv run gunicorn --reload 'service.microservice:start_service()'
 
 Code coverage command with missing statement line numbers  
-> $ pipenv run python -m pytest --cov=service tests/ --cov-report term-missing
+> $ pipenv run python -m pytest -s --cov=service --cov=tasks tests/ --cov-report term-missing
 
 Set up git hook scripts with pre-commit
 > $ pipenv run pre-commit install
