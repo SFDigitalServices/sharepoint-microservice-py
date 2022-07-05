@@ -1,84 +1,30 @@
-""" util functions for interacting with ms graph """
-# pylint: disable=too-many-locals
+""" file/drive related graph functions """
 import os
-from io import BytesIO
 from urllib.parse import urlparse
+from io import BytesIO
 import shutil
 import tempfile
 import requests
-import msal
+from service.resources.graph import common
 
-HOST_NAME = os.environ.get("SHAREPOINT_HOST_NAME")
-CLIENT_ID = os.environ.get("SHAREPOINT_CLIENT_ID")
-CLIENT_SECRET = os.environ.get("SHAREPOINT_CLIENT_SECRET")
-TENANT_ID = os.environ.get("SHAREPOINT_TENANT_ID")
-
-AUTHORITY = "https://login.microsoftonline.com/" + TENANT_ID
-ENDPOINT = "https://graph.microsoft.com/v1.0"
-
-SCOPES = ['https://graph.microsoft.com/.default']
+# pylint: disable=too-many-locals
 
 # must be multiple of 327,680 bytes
 FILE_CHUNK_SIZE = int(os.environ.get("FILE_CHUNK_SIZE", "10485760"))
 
-
-def get_access_token():
-    """ get token from ms graph """
-    app = msal.ConfidentialClientApplication(
-            CLIENT_ID,
-            authority=AUTHORITY,
-            client_credential=CLIENT_SECRET)
-    try:
-        access_token = app.acquire_token_silent(SCOPES, account=None)
-        if not access_token:
-            try:
-                access_token = app.acquire_token_for_client(scopes=SCOPES)
-                print(f'accessToken: {access_token}')
-                if access_token.get('access_token', False):
-                    print('New access token retreived....')
-                else:
-                    print('Error aquiring authorization token. Check tenantID, clientID or clientSecret.') # pylint: disable=line-too-long
-                    raise PermissionError("unable to acquire token")
-            except Exception as err:
-                raise err
-        else:
-            print('Token retreived from MSAL Cache....')
-
-        return access_token['access_token']
-    except Exception as err:
-        print(f"get_access_token error: {err}")
-        raise err
-
-def make_request(method, resource, access_token, json_body=None):
-    """ make a sharepoint request """
-    results = requests.request(
-        method,
-        f'{ENDPOINT}{resource}',
-        headers={
-            'Authorization': f'Bearer {access_token}'},
-        json=json_body)
-    print(f"make_request - {resource}: {results.json()}")
-    results.raise_for_status()
-    return results.json()
-
-def get_site_id(site_name, access_token):
-    """ retrieves site_id of given site_name """
-    result = make_request('GET', f'/sites/{HOST_NAME}:/sites/{site_name}', access_token)
-    return result['id']
-
 def get_default_drive_id(site_id, access_token):
     """ retrieves default drive id of given site_name """
-    result = make_request('GET',f'/sites/{site_id}/drive', access_token)
+    result = common.make_request('GET',f'/sites/{site_id}/drive', access_token)
     return result['id']
 
 def list_drive_items(drive_id, access_token):
     """ list root items in drive """
-    items = make_request('GET', f'/drives/{drive_id}/root/children', access_token)
+    items = common.make_request('GET', f'/drives/{drive_id}/root/children', access_token)
     return {"items": items['value']}
 
 def list_folder_items(drive_id, path_from_root, access_token):
     """ list items in folder """
-    items = make_request(
+    items = common.make_request(
         'GET',
         f'/drives/{drive_id}/root:/{path_from_root}:/children',
         access_token)
@@ -86,13 +32,15 @@ def list_folder_items(drive_id, path_from_root, access_token):
 
 def get_item_info(site_id, path_from_root, access_token):
     """ retrieve file/folder meta data """
-    item = make_request('GET', f'/sites/{site_id}/drive/root:/{path_from_root}', access_token)
+    item = common.make_request(
+        'GET',
+        f'/sites/{site_id}/drive/root:/{path_from_root}', access_token)
     return item
 
 
 def upload_file(drive_id, file_url, upload_path_name, access_token):
     """ upload file found at file_url """
-    upload_session = make_request(
+    upload_session = common.make_request(
         'POST',
         f'/drives/{drive_id}/items/root:/{upload_path_name}:/createUploadSession',
         access_token,

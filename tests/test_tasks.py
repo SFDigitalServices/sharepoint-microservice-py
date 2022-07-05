@@ -12,10 +12,10 @@ from tasks import upload_file
 
 TEST_PDF = 'tests/resources/fake_file.pdf'
 
-@patch('service.resources.graph_api.requests.request')
-@patch('service.resources.graph_api.requests.get')
-@patch('service.resources.graph_api.requests.request')
-@patch('service.resources.graph_api.msal.ConfidentialClientApplication')
+@patch('service.resources.graph.file.requests.request')
+@patch('service.resources.graph.file.requests.get')
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
 def test_upload_file_silent_success(
     mock_graph_client,
     mock_request,
@@ -38,13 +38,15 @@ def test_upload_file_silent_success(
             destination_path="http://final.destination.com/file.pdf"
         ).apply()
 
-@patch('service.resources.graph_api.requests.get')
-@patch('service.resources.graph_api.requests.request')
-@patch('service.resources.graph_api.msal.ConfidentialClientApplication')
+@patch('service.resources.graph.file.requests.request')
+@patch('service.resources.graph.file.requests.get')
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
 def test_upload_file_success(
     mock_graph_client,
     mock_request,
     mock_get,
+    mock_put,
     env_vars):
     """ test file upload with successful retrieval of access token via acquire_token_for_client """
     mock_graph_client.return_value.acquire_token_silent.return_value = None
@@ -63,13 +65,15 @@ def test_upload_file_success(
             destination_path="http://final.destination.com/file.pdf"
         ).apply()
 
-@patch('service.resources.graph_api.requests.get')
-@patch('service.resources.graph_api.requests.request')
-@patch('service.resources.graph_api.msal.ConfidentialClientApplication')
+@patch('service.resources.graph.file.requests.request')
+@patch('service.resources.graph.file.requests.get')
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
 def test_upload_file_error(
     mock_graph_client,
     mock_request,
     mock_get,
+    mock_put,
     env_vars):
     """ test file upload error with failure in retrieving access token """
     mock_graph_client.return_value.acquire_token_silent.return_value = None
@@ -88,13 +92,15 @@ def test_upload_file_error(
             destination_path="http://final.destination.com/file.pdf"
         ).apply()
 
-@patch('service.resources.graph_api.requests.get')
-@patch('service.resources.graph_api.requests.request')
-@patch('service.resources.graph_api.msal.ConfidentialClientApplication')
+@patch('service.resources.graph.file.requests.request')
+@patch('service.resources.graph.file.requests.get')
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
 def test_upload_auth_error(
     mock_graph_client,
     mock_request,
     mock_get,
+    mock_put,
     env_vars):
     """ test file upload error with failure in authentication """
     mock_graph_client.return_value.acquire_token_silent.return_value = None
@@ -116,10 +122,10 @@ def test_upload_auth_error(
             destination_path="http://final.destination.com/file.pdf"
         ).apply()
 
-@patch('service.resources.graph_api.requests.request')
-@patch('service.resources.graph_api.requests.get')
-@patch('service.resources.graph_api.requests.request')
-@patch('service.resources.graph_api.msal.ConfidentialClientApplication')
+@patch('service.resources.graph.file.requests.request')
+@patch('service.resources.graph.file.requests.get')
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
 def test_upload_file_cloud(
     mock_graph_client,
     mock_request,
