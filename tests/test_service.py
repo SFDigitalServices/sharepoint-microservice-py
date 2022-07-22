@@ -1,11 +1,12 @@
 # pylint: disable=redefined-outer-name
 """Tests for microservice"""
 import json
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 import jsend
 import pytest
 from falcon import testing
 import service.microservice
+from tests import mocks
 
 # pylint: disable=unused-argument
 
@@ -94,5 +95,51 @@ def test_sharepoint_file_upload(
         json={
             'source_url': 'https://sfgov.org/hello_world.pdf'
         }
+    )
+    assert response.status_code == 500
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_add_list_item(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test endpoint to add a list item to an existing list """
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_add_item = Mock()
+    mock_add_item.json.return_value = mocks.ADD_ITEM_RESPONSE
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_add_item
+    ]
+
+    response = client.simulate_post(
+        '/sharepoint/sfds_site/lists/list_name/items',
+        json=mocks.LIST_ITEM
+    )
+    assert response.status_code == 200
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_add_list_item_error(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test error case when adding a list item to an existing list """
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_request.side_effect = [
+        mock_get_site_info,
+        Exception('Error')
+    ]
+
+    response = client.simulate_post(
+        '/sharepoint/sfds_site/lists/list_name/items',
+        json=mocks.LIST_ITEM
     )
     assert response.status_code == 500

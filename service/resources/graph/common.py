@@ -49,9 +49,10 @@ def make_request(method, resource, access_token, json_body=None):
         headers={
             'Authorization': f'Bearer {access_token}'},
         json=json_body)
-    print(f"make_request - {resource}: {results.json()}")
+    content = results.json() if results.content else {}
+    print(f"make_request - {resource}: {content}")
     results.raise_for_status()
-    return results.json()
+    return content
 
 def get_site_id(site_name, access_token):
     """ retrieves site_id of given site_name """
