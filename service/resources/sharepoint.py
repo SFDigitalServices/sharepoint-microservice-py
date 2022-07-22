@@ -1,10 +1,12 @@
 """ sharepoint module"""
 #pylint: disable=too-few-public-methods,no-self-use
 import json
+import traceback
 import falcon
 import jsend
 import requests
 from tasks import upload_file
+from service.resources.graph import common, list as sharepoint_list
 from .hooks import validate_access
 
 @falcon.before(validate_access)
@@ -40,5 +42,37 @@ class File():
         except Exception as err:    # pylint: disable=broad-except
             print("sharepoint.file on_put error:")
             print(f"{err}")
+            print(traceback.format_exc())
+            resp.status = falcon.HTTP_500
+            resp.text = json.dumps(jsend.error(f"{err}"))
+
+@falcon.before(validate_access)
+class ListItems():
+    """ Handle sharepoint list item requests """
+    def on_post(self, _req, resp, site_name, list_identifier):
+        """
+            add item to a list
+        """
+        try:
+            json_params = json.loads(_req.bounded_stream.read())
+
+            access_token = common.get_access_token()
+            site_id = common.get_site_id(site_name, access_token)
+            add_item_resp = sharepoint_list.add_list_item(
+                site_id,
+                list_identifier,
+                json_params,
+                access_token
+            )
+
+            resp.text = json.dumps(jsend.success({
+                "msg": "success",
+                "response": add_item_resp
+            }))
+            resp.status = falcon.HTTP_200
+        except Exception as err:    # pylint: disable=broad-except
+            print("sharepoint.ListItems on_post error:")
+            print(f"{err}")
+            print(traceback.format_exc())
             resp.status = falcon.HTTP_500
             resp.text = json.dumps(jsend.error(f"{err}"))

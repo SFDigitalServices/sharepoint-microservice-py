@@ -3,7 +3,8 @@
 import celery
 from kombu import serialization
 import celeryconfig
-from service.resources import graph_api
+from service.resources.graph import common
+from service.resources.graph import file
 
 # pylint: disable=unused-argument
 
@@ -19,11 +20,11 @@ def upload_file(self, site_name, source_url, destination_path):
         upload a file to sharepoint drive
     """
     try:
-        access_token = graph_api.get_access_token()
-        site_id = graph_api.get_site_id(site_name, access_token)
-        drive_id = graph_api.get_default_drive_id(site_id, access_token)
+        access_token = common.get_access_token()
+        site_id = common.get_site_id(site_name, access_token)
+        drive_id = file.get_default_drive_id(site_id, access_token)
 
-        graph_api.upload_file(drive_id, source_url, destination_path, access_token)
+        file.upload_file(drive_id, source_url, destination_path, access_token)
     except Exception as err: # pylint: disable=broad-except
         print("tasks.upload_file error:")
         print(f"{err}")
