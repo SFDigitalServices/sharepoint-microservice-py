@@ -82,3 +82,32 @@ Set up git hook scripts with pre-commit
 
 ## Heroku Integration
 * Set ACCESS_TOKEN environment variable and pass it as a header in requests
+
+## Examples
+* Upload a file to sharepoint
+    PUT https://my.service.com/sharepoint/site_name/files
+    Body (JSON):
+    {
+        "source_url": "https://static.server.gov/img/001.png",
+        "destination_path": "001.png"
+    }
+
+    200 OK
+
+* Add a site list item
+    POST https://my.service.com/sharepoint/site_name/lists/list_name/items
+    {
+        "Title": "Newt Scamander",
+        "House": "Hufflepuff"
+    }
+
+    200 OK
+
+* Add a subsite list item
+    POST https://my.service.com/sharepoint/site_name/sites/test_subsite/lists/subsite_list/items
+    {
+        "Title": "First",
+        "Description": "Test"
+    }
+
+    200 OK
