@@ -1261,3 +1261,24 @@ INVALID_REQUEST = {
         }
     }
 }
+
+SUBSITES = {
+    "value": [
+        {
+            "id": "contoso.sharepoint.com,da60e844",
+            "name": "Team A Subsite",
+            "description": "",
+            "createdDateTime": "2016-10-18T03:05:59Z",
+            "lastModifiedDateTime": "2016-10-18T10:40:59Z",
+            "webUrl": "https://contoso.sharepoint.com/sites/site/subsiteA"
+        },
+        {
+            "id": "contoso.sharepoint.com,da60e844",
+            "name": "Team B Subsite",
+            "description": "",
+            "createdDateTime": "2016-10-18T03:05:59Z",
+            "lastModifiedDateTime": "2016-10-18T10:40:59Z",
+            "webUrl": "https://contoso.sharepoint.com/sites/site/subsiteB"
+        }
+    ]
+}

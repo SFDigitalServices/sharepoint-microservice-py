@@ -58,3 +58,15 @@ def get_site_id(site_name, access_token):
     """ retrieves site_id of given site_name """
     result = make_request('GET', f'/sites/{HOST_NAME}:/sites/{site_name}', access_token)
     return result['id']
+
+def get_subsite_id(site_name, subsite_name, access_token):
+    """ retrieves subsite_id """
+    subsites = make_request(
+        'GET',
+        f'/sites/{HOST_NAME}:/sites/{site_name}/sites',
+        access_token)
+
+    for subsite in subsites['value']:
+        if subsite['name'] == subsite_name:
+            return subsite['id']
+    raise Exception("Subsite not found")

@@ -76,3 +76,34 @@ class ListItems():
             print(traceback.format_exc())
             resp.status = falcon.HTTP_500
             resp.text = json.dumps(jsend.error(f"{err}"))
+
+@falcon.before(validate_access)
+class SubsiteListItems():
+    """ Handle sharepoint subsite list item requests """
+    def on_post(self, _req, resp, site_name, subsite_name, list_identifier):
+        """
+            add item to a subsite's list
+        """
+        try:
+            json_params = json.loads(_req.bounded_stream.read())
+
+            access_token = common.get_access_token()
+            subsite_id = common.get_subsite_id(site_name, subsite_name, access_token)
+            add_item_resp = sharepoint_list.add_list_item(
+                subsite_id,
+                list_identifier,
+                json_params,
+                access_token
+            )
+
+            resp.text = json.dumps(jsend.success({
+                "msg": "success",
+                "response": add_item_resp
+            }))
+            resp.status = falcon.HTTP_200
+        except Exception as err:    # pylint: disable=broad-except
+            print("sharepoint.ListItems on_post error:")
+            print(f"{err}")
+            print(traceback.format_exc())
+            resp.status = falcon.HTTP_500
+            resp.text = json.dumps(jsend.error(f"{err}"))
