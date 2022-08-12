@@ -154,11 +154,14 @@ def test_sharepoint_subsite_add_list_item(
     """ Test endpoint to add a list item to an existing subsite list """
     mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
 
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
     mock_get_subsites = Mock()
     mock_get_subsites.json.return_value = mocks.SUBSITES
     mock_add_item = Mock()
     mock_add_item.json.return_value = mocks.ADD_ITEM_RESPONSE
     mock_request.side_effect = [
+        mock_get_site_info,
         mock_get_subsites,
         mock_add_item
     ]
@@ -179,9 +182,12 @@ def test_sharepoint_subsite_add_list_item_error(
     """ Test error case when adding a list item to an existing subsite list """
     mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
 
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
     mock_get_subsites = Mock()
     mock_get_subsites.json.return_value = mocks.SUBSITES
     mock_request.side_effect = [
+        mock_get_site_info,
         mock_get_subsites,
         Exception('Error')
     ]
@@ -196,6 +202,7 @@ def test_sharepoint_subsite_add_list_item_error(
     mock_add_item = Mock()
     mock_add_item.json.return_value = mocks.ADD_ITEM_RESPONSE
     mock_request.side_effect = [
+        mock_get_site_info,
         mock_get_subsites,
         mock_add_item
     ]

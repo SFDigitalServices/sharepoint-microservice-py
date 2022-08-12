@@ -61,9 +61,11 @@ def get_site_id(site_name, access_token):
 
 def get_subsite_id(site_name, subsite_name, access_token):
     """ retrieves subsite_id """
+    site_id = get_site_id(site_name, access_token)
+
     subsites = make_request(
         'GET',
-        f'/sites/{HOST_NAME}:/sites/{site_name}/sites',
+        f'/sites/{site_id}/sites',
         access_token)
 
     for subsite in subsites['value']:
