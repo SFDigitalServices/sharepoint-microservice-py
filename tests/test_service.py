@@ -143,3 +143,72 @@ def test_sharepoint_add_list_item_error(
         json=mocks.LIST_ITEM
     )
     assert response.status_code == 500
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_subsite_add_list_item(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test endpoint to add a list item to an existing subsite list """
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_get_subsites = Mock()
+    mock_get_subsites.json.return_value = mocks.SUBSITES
+    mock_add_item = Mock()
+    mock_add_item.json.return_value = mocks.ADD_ITEM_RESPONSE
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_get_subsites,
+        mock_add_item
+    ]
+
+    response = client.simulate_post(
+        '/sharepoint/sfds_site/sites/Team B Subsite/lists/list_name/items',
+        json=mocks.LIST_ITEM
+    )
+    assert response.status_code == 200
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_subsite_add_list_item_error(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test error case when adding a list item to an existing subsite list """
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_get_subsites = Mock()
+    mock_get_subsites.json.return_value = mocks.SUBSITES
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_get_subsites,
+        Exception('Error')
+    ]
+
+    response = client.simulate_post(
+        '/sharepoint/sfds_site/sites/Team B Subsite/lists/list_name/items',
+        json=mocks.LIST_ITEM
+    )
+    assert response.status_code == 500
+
+    # test subsite not found
+    mock_add_item = Mock()
+    mock_add_item.json.return_value = mocks.ADD_ITEM_RESPONSE
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_get_subsites,
+        mock_add_item
+    ]
+
+    response_invalid_subsite = client.simulate_post(
+        '/sharepoint/sfds_site/sites/Team Z Subsite/lists/list_name/items',
+        json=mocks.LIST_ITEM
+    )
+    assert response_invalid_subsite.status_code == 500
