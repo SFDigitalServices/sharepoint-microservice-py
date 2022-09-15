@@ -33,6 +33,7 @@ def test_welcome(client, mock_env_access_key):
     # pylint: disable=unused-argument
     # mock_env_access_key is a fixture and creates a false positive for pylint
     """Test welcome message response"""
+    print("************* test_welcome")
     response = client.simulate_get('/welcome')
     assert response.status_code == 200
 
@@ -48,12 +49,14 @@ def test_welcome_no_access_key(client, mock_env_no_access_key):
     # pylint: disable=unused-argument
     # mock_env_no_access_key is a fixture and creates a false positive for pylint
     """Test welcome request with no ACCESS_key environment var set"""
+    print("************* test_welcome_no_access_key")
     response = client.simulate_get('/welcome')
     assert response.status_code == 403
 
 def test_default_error(client, mock_env_access_key):
     # pylint: disable=unused-argument
     """Test default error response"""
+    print("************* test_default_error")
     response = client.simulate_get('/some_page_that_does_not_exist')
 
     assert response.status_code == 404
@@ -69,6 +72,7 @@ def test_sharepoint_file_upload(
     client,
     mock_env_access_key):
     """ Test file upload endpoint """
+    print("************* test_sharepoint_file_upload")
 
     # happy path
     response = client.simulate_put(
@@ -106,6 +110,7 @@ def test_sharepoint_add_list_item(
     client,
     mock_env_access_key):
     """ Test endpoint to add a list item to an existing list """
+    print("************* test_sharepoint_add_list_item")
     mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
     mock_get_site_info = Mock()
     mock_get_site_info.json.return_value = mocks.SITE_INFO
@@ -130,6 +135,7 @@ def test_sharepoint_add_list_item_error(
     client,
     mock_env_access_key):
     """ Test error case when adding a list item to an existing list """
+    print("************* test_sharepoint_add_list_item_error")
     mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
     mock_get_site_info = Mock()
     mock_get_site_info.json.return_value = mocks.SITE_INFO
@@ -152,6 +158,7 @@ def test_sharepoint_subsite_add_list_item(
     client,
     mock_env_access_key):
     """ Test endpoint to add a list item to an existing subsite list """
+    print("************* test_sharepoint_subsite_add_list_item")
     mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
 
     mock_get_site_info = Mock()
@@ -180,6 +187,7 @@ def test_sharepoint_subsite_add_list_item_error(
     client,
     mock_env_access_key):
     """ Test error case when adding a list item to an existing subsite list """
+    print("************* test_sharepoint_subsite_add_list_item_error")
     mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
 
     mock_get_site_info = Mock()
@@ -212,3 +220,58 @@ def test_sharepoint_subsite_add_list_item_error(
         json=mocks.LIST_ITEM
     )
     assert response_invalid_subsite.status_code == 500
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_subsite_get_list_item(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test endpoint to retrieve a list item from an existing subsite list """
+    print("************* test_sharepoint_subsite_get_list_item")
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_get_subsites = Mock()
+    mock_get_subsites.json.return_value = mocks.SUBSITES
+    mock_get_item = Mock()
+    mock_get_item.json.return_value = mocks.GET_SINGLE_ITEM_RESPONSE
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_get_subsites,
+        mock_get_item
+    ]
+
+    response = client.simulate_get(
+        '/sharepoint/sfds_site/sites/Team B Subsite/lists/list_name/items/50'
+    )
+    assert response.status_code == 200
+    assert response.json['data']['id'] == "50"
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_subsite_get_list_item_error(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test error case when retrieving a list item from an existing subsite list """
+    print("************* test_sharepoint_subsite_get_list_item_error")
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_get_subsites = Mock()
+    mock_get_subsites.json.return_value = mocks.SUBSITES
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_get_subsites,
+        Exception('Error')
+    ]
+
+    response = client.simulate_get(
+        '/sharepoint/sfds_site/sites/Team B Subsite/lists/list_name/items/50'
+    )
+    assert response.status_code == 500

@@ -76,6 +76,16 @@ def test_get_list_items(
     assert len(items) > 0
 
 @patch('service.resources.graph.file.requests.request')
+def test_get_list_item(
+    mock_request,
+    env_vars):
+    """ test retrieval of list item function"""
+    mock_request.return_value.json.return_value = mocks.GET_SINGLE_ITEM_RESPONSE
+
+    item = sharepoint_list.get_list_item('site_id', 'list_identifier', 'access_token', 50)
+    assert item['id'] == "50"
+
+@patch('service.resources.graph.file.requests.request')
 def test_get_list_columns(
     mock_request,
     env_vars):
