@@ -275,3 +275,60 @@ def test_sharepoint_subsite_get_list_item_error(
         '/sharepoint/sfds_site/sites/Team B Subsite/lists/list_name/items/50'
     )
     assert response.status_code == 500
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_subsite_patch_list_item(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test endpoint to update a list item from an existing subsite list """
+    print("************* test_sharepoint_subsite_patch_list_item")
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_get_subsites = Mock()
+    mock_get_subsites.json.return_value = mocks.SUBSITES
+    mock_patch_item = Mock()
+    mock_patch_item.json.return_value = mocks.UPDATE_ITEM_RESPONSE
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_get_subsites,
+        mock_patch_item
+    ]
+
+    response = client.simulate_patch(
+        '/sharepoint/sfds_site/sites/Team B Subsite/lists/list_name/items/8',
+        json=mocks.UPDATE_ITEM_REQUEST
+    )
+    assert response.status_code == 200
+    assert response.json['data']['id'] == "8"
+
+@patch('service.resources.graph.common.requests.request')
+@patch('service.resources.graph.common.msal.ConfidentialClientApplication')
+def test_sharepoint_subsite_patch_list_item_error(
+    mock_graph_client,
+    mock_request,
+    client,
+    mock_env_access_key):
+    """ Test error case when updating a list item from an existing subsite list """
+    print("************* test_sharepoint_subsite_patch_list_item_error")
+    mock_graph_client.return_value.acquire_token_silent.return_value = mocks.ACCESS_TOKEN
+
+    mock_get_site_info = Mock()
+    mock_get_site_info.json.return_value = mocks.SITE_INFO
+    mock_get_subsites = Mock()
+    mock_get_subsites.json.return_value = mocks.SUBSITES
+    mock_request.side_effect = [
+        mock_get_site_info,
+        mock_get_subsites,
+        Exception('Error')
+    ]
+
+    response = client.simulate_patch(
+        '/sharepoint/sfds_site/sites/Team B Subsite/lists/list_name/items/8',
+        json=mocks.UPDATE_ITEM_REQUEST
+    )
+    assert response.status_code == 500

@@ -99,7 +99,7 @@ class SubsiteList():
             resp.text = json.dumps(jsend.success(add_item_resp))
             resp.status = falcon.HTTP_200
         except Exception as err:
-            print("sharepoint.ListItems on_post error:")
+            print("sharepoint.SubsiteList on_post error:")
             print(f"{err}")
             print(traceback.format_exc())
             resp.status = falcon.HTTP_500
@@ -113,7 +113,7 @@ class SubsiteListItem():
             retrieve a subsite list item
         """
         try:
-            print("SubsiteList.on_get")
+            print("SubsiteListItem.on_get")
 
             access_token = common.get_access_token()
             subsite_id = common.get_subsite_id(site_name, subsite_name, access_token)
@@ -123,7 +123,34 @@ class SubsiteListItem():
             resp.status = falcon.HTTP_200
 
         except Exception as err:
-            print("sharepoint.ListItems on_get error:")
+            print("sharepoint.SubsiteListItem on_get error:")
+            print(f"{err}")
+            print(traceback.format_exc())
+            resp.status = falcon.HTTP_500
+            resp.text = json.dumps(jsend.error(f"{err}"))
+
+    def on_patch(self, _req, resp, site_name, subsite_name, list_identifier, item_id):
+        """
+            update a subsite list item
+        """
+        try:
+            print("SubsiteListItem.on_patch")
+
+            json_params = json.loads(_req.bounded_stream.read())
+            access_token = common.get_access_token()
+            subsite_id = common.get_subsite_id(site_name, subsite_name, access_token)
+            item = sharepoint_list.update_list_item(
+                subsite_id,
+                list_identifier,
+                item_id,
+                json_params,
+                access_token)
+
+            resp.text = json.dumps(jsend.success(item))
+            resp.status = falcon.HTTP_200
+
+        except Exception as err:
+            print("sharepoint.SubsiteListIem on_patch error:")
             print(f"{err}")
             print(traceback.format_exc())
             resp.status = falcon.HTTP_500
