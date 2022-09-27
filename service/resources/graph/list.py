@@ -28,6 +28,14 @@ def get_list_items(site_id, list_identifier, access_token):
         access_token)
     return {"items": items['value']}
 
+def get_list_item(site_id, list_identifier, item_id, access_token):
+    """ get a single item in a list """
+    item = common.make_request(
+        'GET',
+        f'/sites/{site_id}/lists/{list_identifier}/items/{item_id}',
+        access_token)
+    return item['fields']
+
 def get_list_columns(site_id, list_identifier, access_token):
     """ get column definitions of a list """
     cols = common.make_request(

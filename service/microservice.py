@@ -5,7 +5,7 @@ import jsend
 import sentry_sdk
 import falcon
 from service.resources.welcome import Welcome
-from service.resources.sharepoint import File, ListItems, SubsiteListItems
+from service.resources.sharepoint import File, ListItems, SubsiteList, SubsiteListItem
 
 def start_service():
     """Start this service
@@ -19,8 +19,11 @@ def start_service():
     api.add_route('/sharepoint/{site_name}/files', File())
     api.add_route('/sharepoint/{site_name}/lists/{list_identifier}/items', ListItems())
     api.add_route(
+        '/sharepoint/{site_name}/sites/{subsite_name}/lists/{list_identifier}/items/{item_id}',
+        SubsiteListItem())
+    api.add_route(
         '/sharepoint/{site_name}/sites/{subsite_name}/lists/{list_identifier}/items',
-        SubsiteListItems())
+        SubsiteList())
     api.add_sink(default_error, '')
     return api
 

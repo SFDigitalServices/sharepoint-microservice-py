@@ -761,6 +761,84 @@ GET_LIST_ITEMS_RESPONSE = {
     ]
 }
 
+GET_SINGLE_ITEM_RESPONSE = {
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#sites('site_id')/lists('list_id')/items/$entity",
+    "@odata.etag": "\"c11abe65\"",
+    "createdDateTime": "2022-09-08T21:32:59Z",
+    "eTag": "\"c11abe65\"",
+    "id": "50",
+    "lastModifiedDateTime": "2022-09-08T21:32:59Z",
+    "webUrl": "https://host_name/sites/site_id/sub_site/Lists/list_id/50_.000",
+    "createdBy": {
+        "user": {
+            "displayName": "SharePoint App"
+        }
+    },
+    "lastModifiedBy": {
+        "application": {
+            "id": "8a582a7b",
+            "displayName": "bob"
+        },
+        "user": {
+            "displayName": "SharePoint App"
+        }
+    },
+    "parentReference": {
+        "id": "cedb7dc2",
+        "siteId": "site_id"
+    },
+    "contentType": {
+        "id": "0x0100923C307344",
+        "name": "Item"
+    },
+    "fields@odata.context": "https://graph.microsoft.com/v1.0/$metadata#sites('site_id')/lists('list_id')/items('50')/fields/$entity",
+    "fields": {
+        "@odata.etag": "\"c11abe65\"",
+        "id": "50",
+        "ContentType": "Item",
+        "Modified": "2022-09-08T21:32:59Z",
+        "Created": "2022-09-08T21:32:59Z",
+        "AuthorLookupId": "10737",
+        "EditorLookupId": "10737",
+        "_UIVersionString": "1.0",
+        "Attachments": False,
+        "Edit": "",
+        "ItemChildCount": "0",
+        "FolderChildCount": "0",
+        "_ComplianceFlags": "",
+        "_ComplianceTag": "",
+        "_ComplianceTagWrittenTime": "",
+        "_ComplianceTagUserId": "",
+        "AppAuthorLookupId": "11",
+        "AppEditorLookupId": "11",
+        "Status": "Active",
+        "CheckList1Call": False,
+        "CheckList2Ask": False,
+        "CheckList3SendRecap": False,
+        "CheckList4Agree": False,
+        "CheckList5ReachOut": False,
+        "CheckList5ANegativeT": False,
+        "CheckList5BPositiveT": False,
+        "CheckList6SendClearance": False,
+        "AgreedReturnDate1": "#Name?",
+        "EmployeeSubmittedName": "#Name?",
+        "Agreed": "#Name?",
+        "haveYouSubmittedToPP": False,
+        "ipDate": "2022-08-04T07:00:00Z",
+        "availableOnTeams": False,
+        "supervisorName": "sdf",
+        "supervisorEmail": "email@test.com",
+        "supervisorPhoneNumber": "(111) 111-1111",
+        "firstName": "test",
+        "lastName": "test",
+        "rtwDate": "2022-08-16T07:00:00Z",
+        "earlyRtwDate5": "2022-08-11T07:00:00Z",
+        "earlyRtwDate6": "2022-08-12T07:00:00Z",
+        "lastDateOnSite": "2022-08-29T07:00:00Z",
+        "employeePreferredEmail": "test@test.com"
+    }
+}
+
 GET_LIST_COLUMNS_RESPONSE = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#sites('site_id')/lists('list_id')/columns",
     "value": [
