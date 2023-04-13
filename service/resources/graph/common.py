@@ -7,7 +7,7 @@ import msal
 HOST_NAME = os.environ.get("SHAREPOINT_HOST_NAME")
 CLIENT_ID = os.environ.get("SHAREPOINT_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("SHAREPOINT_CLIENT_SECRET")
-TENANT_ID = os.environ.get("SHAREPOINT_TENANT_ID")
+TENANT_ID = os.environ.get("SHAREPOINT_TENANT_ID", "")
 
 AUTHORITY = "https://login.microsoftonline.com/" + TENANT_ID
 ENDPOINT = "https://graph.microsoft.com/v1.0"
